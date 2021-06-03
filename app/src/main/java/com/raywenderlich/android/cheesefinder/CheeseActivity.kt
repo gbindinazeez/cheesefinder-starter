@@ -37,6 +37,7 @@ import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_cheeses.*
 import java.util.concurrent.TimeUnit
@@ -188,7 +189,7 @@ class CheeseActivity : BaseSearchActivity() {
                 .toFlowable(BackpressureStrategy.BUFFER)
         val searchTextObservable = Flowable.merge<String>(buttonClickStream,textChangeStream)
 
-        searchTextObservable
+        disposable = searchTextObservable
 
                 .observeOn(AndroidSchedulers.mainThread())
 
@@ -204,4 +205,15 @@ class CheeseActivity : BaseSearchActivity() {
                     showResult(it)
                 }
     }
+
+    // TODO RxJava and Activity/Fragment lifecycle
+    override fun onStop() {
+        super.onStop()
+        if (!disposable.isDisposed){
+            disposable.dispose()
+        }
+    }
+
+    // TODO RxJava and Activity/Fragment lifecycle
+    private lateinit var disposable: Disposable
 }
